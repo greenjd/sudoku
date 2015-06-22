@@ -174,7 +174,7 @@ void SudokuScene::resizeScene(int width, int height) {
     QGraphicsItem * item;
     foreach (item, this->items()) {
         item->setPos(item->pos() * scaledScale);
-        item->scale(scaledScale, scaledScale);
+        item->setTransform(QTransform::fromScale((qreal)scaledScale, (qreal)scaledScale), true);
     }
 
     m_currentScale = scale;
@@ -263,7 +263,7 @@ void SudokuScene::animationStep(void) {
  */
 void SudokuScene::pause(bool paused) {
     if (!m_paused && paused) {
-        m_pauseOverlay->scale(m_currentScale, m_currentScale);
+        m_pauseOverlay->setTransform(QTransform::fromScale(m_currentScale, m_currentScale));
         addItem(m_pauseOverlay);
         installEventFilter(m_filter);
         update(QRectF(0, 0, Dimensions::boardSize, Dimensions::boardSize));
@@ -271,7 +271,7 @@ void SudokuScene::pause(bool paused) {
     else if (m_paused && !paused) {
         removeItem(m_pauseOverlay);
         double scaleBack = 1.0 / m_currentScale;
-        m_pauseOverlay->scale(scaleBack, scaleBack);
+        m_pauseOverlay->setTransform(QTransform::fromScale(scaleBack, scaleBack));
         removeEventFilter(m_filter);
         update(QRectF(0, 0, Dimensions::boardSize, Dimensions::boardSize));
     }
