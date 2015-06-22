@@ -174,7 +174,7 @@ void SudokuScene::resizeScene(int width, int height) {
     QGraphicsItem * item;
     foreach (item, this->items()) {
         item->setPos(item->pos() * scaledScale);
-        item->setTransform(QTransform::fromScale((qreal)scaledScale, (qreal)scaledScale), true);
+        item->setTransform(QTransform::fromScale(scaledScale, scaledScale), true);
     }
 
     m_currentScale = scale;
