@@ -25,7 +25,7 @@
 #include "../Board.h"
 #include "../Sudoku.h"
 #include "../BoardGenerator.h"
-
+#include "../HistoryElement.h"
 
 class SudokuGame : public QObject {
 
@@ -106,6 +106,7 @@ private:
     Board * m_originalBoard;
     Board * m_board;
     bool m_choices[9][9][9];
+    list< HistoryElement > m_list;
     unsigned int m_duration;
     bool m_mustGenerateBoard;
 

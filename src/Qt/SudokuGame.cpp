@@ -324,6 +324,7 @@ void SudokuGame::enableChoice(int x, int y, int number) {
     qDebug() << "SudokuGame::enableChoice() signal received, x =" << x << ", y =" << y << ", number =" << number;
 
     m_choices[x][y][number - 1] = true;
+    m_list.push_back(HistoryElement(x, y, HistoryElement::ENABLE_CHOICE, number));
 
     emit changed(x, y);
 }
@@ -342,6 +343,7 @@ void SudokuGame::disableChoice(int x, int y, int number) {
     qDebug() << "SudokuGame::disableChoice() signal received, x =" << x << ", y =" << y << ", number =" << number;
 
     m_choices[x][y][number - 1] = false;
+    m_list.push_back(HistoryElement(x, y, HistoryElement::DISABLE_CHOICE, number));
 
     emit changed(x, y);
 }
@@ -365,6 +367,7 @@ void SudokuGame::setFinalChoice(int x, int y, int number) {
     #ifndef QT_NO_DEBUG_OUTPUT 
         qDebug() << "SudokuGame::setFinalChoice()" << "Set final choice (" << number << ") for (" << x << "," << y << ").";
     #endif
+    m_list.push_back(HistoryElement(x, y, HistoryElement::SET_FINAL_CHOICE, number));
 
     emit changed(x, y);
 
@@ -390,6 +393,7 @@ void SudokuGame::unsetFinalChoice(int x, int y) {
     #ifndef QT_NO_DEBUG_OUTPUT 
         qDebug() << "SudokuGame::unsetFinalChoice()" << "Unset final choice for (" << x << "," << y << ").";
     #endif
+    m_list.push_back(HistoryElement(x, y, HistoryElement::UNSET_FINAL_CHOICE, 0));
 
     emit changed(x, y);
 }
