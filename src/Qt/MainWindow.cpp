@@ -113,6 +113,7 @@ void MainWindow::newGame(SudokuGame * game, bool isLoaded) {
     connect(m_game, SIGNAL(finished(unsigned int)),             this, SLOT(gameFinished(unsigned int)));
     connect(aPause, SIGNAL(toggled(bool)),                      m_game, SLOT(pause(bool)));
     connect(aReset, SIGNAL(triggered()),                        m_game, SLOT(reset()));
+    connect(aUndo, SIGNAL(triggered()),                        m_game, SLOT(undoLastMove()));
 
     // If this game is being loaded, then restore its settings.
     if (isLoaded) {
@@ -284,6 +285,7 @@ void MainWindow::enableGameActions(bool enable) {
     aPause->setEnabled(enable);
     aReset->setEnabled(enable);
     aSolve->setEnabled(enable);
+    aUndo->setEnabled(enable);
 
     aExportToCSV->setEnabled(enable);
     aPrint->setEnabled(enable);
@@ -333,6 +335,8 @@ void MainWindow::setupSudokuMenu(void) {
     aSolve = mSudoku->addAction(tr("Solve game"));
     aSolve->setShortcut(tr("S"));
     connect(aSolve, SIGNAL(triggered()), this, SLOT(solveGame()));
+    aUndo = mSudoku->addAction(tr("Undo last move"));
+    aUndo->setShortcut(tr("U"));
 
     mSudoku->addSeparator();
 

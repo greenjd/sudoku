@@ -320,13 +320,14 @@ void SudokuGame::reset(void) {
  * @param number
  *   A number (1-9).
  */
-void SudokuGame::enableChoice(int x, int y, int number) {
+void SudokuGame::enableChoice(int x, int y, int number, bool updateHist) {
     qDebug() << "SudokuGame::enableChoice() signal received, x =" << x << ", y =" << y << ", number =" << number;
 
     m_choices[x][y][number - 1] = true;
-    m_list.push_back(HistoryElement(x, y, HistoryElement::ENABLE_CHOICE, number));
-
-    emit changed(x, y);
+    if (updateHist) {
+        m_list.push_back(HistoryElement(x, y, HistoryElement::ENABLE_CHOICE, number));
+        emit changed(x, y);
+    }
 }
 
 /**
@@ -339,13 +340,14 @@ void SudokuGame::enableChoice(int x, int y, int number) {
  * @param number
  *   A number (1-9).
  */
-void SudokuGame::disableChoice(int x, int y, int number) {
+void SudokuGame::disableChoice(int x, int y, int number, bool updateHist) {
     qDebug() << "SudokuGame::disableChoice() signal received, x =" << x << ", y =" << y << ", number =" << number;
 
     m_choices[x][y][number - 1] = false;
-    m_list.push_back(HistoryElement(x, y, HistoryElement::DISABLE_CHOICE, number));
-
-    emit changed(x, y);
+    if (updateHist) {
+        m_list.push_back(HistoryElement(x, y, HistoryElement::DISABLE_CHOICE, number));
+        emit changed(x, y);
+    }
 }
 
 /**
@@ -358,7 +360,7 @@ void SudokuGame::disableChoice(int x, int y, int number) {
  * @param number
  *   A number (1-9).
  */
-void SudokuGame::setFinalChoice(int x, int y, int number) {
+void SudokuGame::setFinalChoice(int x, int y, int number, bool updateHist) {
     m_board->Set(x, y, (char) number);
     m_lastFinalChoiceX = x;
     m_lastFinalChoiceY = y;
@@ -367,9 +369,10 @@ void SudokuGame::setFinalChoice(int x, int y, int number) {
     #ifndef QT_NO_DEBUG_OUTPUT 
         qDebug() << "SudokuGame::setFinalChoice()" << "Set final choice (" << number << ") for (" << x << "," << y << ").";
     #endif
-    m_list.push_back(HistoryElement(x, y, HistoryElement::SET_FINAL_CHOICE, number));
-
-    emit changed(x, y);
+    if (updateHist) {
+        m_list.push_back(HistoryElement(x, y, HistoryElement::SET_FINAL_CHOICE, number));
+        emit changed(x, y);
+    }
 
     if (m_board->IsFull() && m_board->IsValid()) {
         m_finished = true;
@@ -386,18 +389,48 @@ void SudokuGame::setFinalChoice(int x, int y, int number) {
  * @param y
  *   A valid y-coordinate (0-8).
  */
-void SudokuGame::unsetFinalChoice(int x, int y) {
+void SudokuGame::unsetFinalChoice(int x, int y, bool updateHist) {
+    int oldValue = m_board->Get(x, y);
     m_board->Remove(x, y);
     performAllCalculations();
 
     #ifndef QT_NO_DEBUG_OUTPUT 
         qDebug() << "SudokuGame::unsetFinalChoice()" << "Unset final choice for (" << x << "," << y << ").";
     #endif
-    m_list.push_back(HistoryElement(x, y, HistoryElement::UNSET_FINAL_CHOICE, 0));
-
-    emit changed(x, y);
+    if (updateHist) {
+        m_list.push_back(HistoryElement(x, y, HistoryElement::UNSET_FINAL_CHOICE, oldValue));
+        emit changed(x, y);
+    }
 }
 
+/**
+ * Undo the last move.
+ *
+ */
+ void SudokuGame::undoLastMove() {
+    if (m_list.size() == 0) {
+        qDebug() << "No History";
+        return;
+    }
+    HistoryElement lastMove = m_list.back();
+    switch (lastMove.GetType()) {
+        case HistoryElement::ENABLE_CHOICE:
+            this->disableChoice(lastMove.GetX(), lastMove.GetY(), lastMove.GetNumber(), false);
+            break;
+        case HistoryElement::DISABLE_CHOICE:
+            this->enableChoice(lastMove.GetX(), lastMove.GetY(), lastMove.GetNumber(), false);
+            break;
+        case HistoryElement::SET_FINAL_CHOICE:
+            this->unsetFinalChoice(lastMove.GetX(), lastMove.GetY(), false);
+            break;
+        case HistoryElement::UNSET_FINAL_CHOICE:
+            this->setFinalChoice(lastMove.GetX(), lastMove.GetY(), lastMove.GetNumber(), false);
+            break;
+    }
+
+    emit changed(lastMove.GetX(), lastMove.GetY());
+    m_list.pop_back();
+ }
 
 //----------------------------------------------------------------------------
 // Private slots.

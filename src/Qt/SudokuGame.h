@@ -65,11 +65,12 @@ public slots:
     void start(void);
     void pause(bool pause);
     void reset(void);
+    void undoLastMove(void);
 
-    void enableChoice(int x, int y, int number);
-    void disableChoice(int x, int y, int number);
-    void setFinalChoice(int x, int y, int number);
-    void unsetFinalChoice(int x, int y);
+    void enableChoice(int x, int y, int number, bool updateHist = true);
+    void disableChoice(int x, int y, int number, bool updateHist = true);
+    void setFinalChoice(int x, int y, int number, bool updateHist = true);
+    void unsetFinalChoice(int x, int y, bool updateHist = true);
 
 private slots:
     void updateDuration(void);

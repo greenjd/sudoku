@@ -20,7 +20,7 @@ public:
     static const int ENABLE_CHOICE = 1;
     static const int DISABLE_CHOICE = 2;
     static const int SET_FINAL_CHOICE = 3;
-    static const int UNSET_FINAL_CHOICE = 1;
+    static const int UNSET_FINAL_CHOICE = 4;
 
 private:
     int m_x;

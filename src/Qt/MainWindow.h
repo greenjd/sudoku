@@ -87,6 +87,7 @@ private:
     QAction * aPause;
     QAction * aReset;
     QAction * aSolve;
+    QAction * aUndo;
     QAction * aImportFromCSV;
     QAction * aExportToCSV;
     QAction * aPrint;
